@@ -160,6 +160,11 @@ minetest.register_on_leaveplayer(function(player)
 	duel.lose(player:get_player_name())
 end)
 
+-- TODO: add a way to draw, if rewards for winning are implmented
+minetest.register_on_shutdown(function()
+	duel.lose(duel_data.challenger_name)
+end)
+
 minetest.register_on_dieplayer(function(player)
 	local name = player:get_player_name()
 	if duel.in_duel(name) then
@@ -189,7 +194,7 @@ end)
 
 -- Register chat commands
 
-dofile(modpath.."chatcommands")
+dofile(modpath.."/chatcommands.lua")
 if dev_mode then
-	dofile(modpath.."dev_chatcommands")
+	dofile(modpath.."/dev_chatcommands.lua")
 end
