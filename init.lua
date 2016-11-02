@@ -203,8 +203,17 @@ core.register_chatcommand("duel_accept", {
 	end,
 })
 
--- Dev stuff
--- TODO: remove when the mod becomes less WIP
+core.register_chatcommand("duel_abandon", {
+	description = "Abandon a duel before one of the players dies (causes you to lose)",
+	func = function(caller, param)
+		if duel.lose(caller) then
+			return true, "You have abandon a duel"
+		else
+			return false, "You are not in a duel"
+		end
+	end,
+})
+
 if dev_mode then 
 	core.register_chatcommand("restore", {
 		description = "restore inventory",
