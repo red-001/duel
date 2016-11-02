@@ -1,4 +1,5 @@
 duel = {}
+
 -- TODO: use a setting for this
 duel.pos1={x=0,y=0,z=0}
 duel.pos2={x=10,y=0,z=10}
@@ -76,6 +77,7 @@ local function end_duel(winner, loser)
 	end
 	minetest.chat_send_player(winner,"You have defeated "..loser.."!")
 	minetest.chat_send_player(loser,"You have been defeated by "..winner.."!")
+	-- Restore player data
 	local player_winner = minetest.get_player_by_name(winner)
 	local player_loser = minetest.get_player_by_name(loser)
 	local inv1 = player_winner:get_inventory()
@@ -84,10 +86,19 @@ local function end_duel(winner, loser)
 	player_loser:setpos(duel_data[loser].pos)
 	restore_player_inv(inv1)
 	restore_player_inv(inv2)
+	-- Clean up
+	duel_data[loser] = nil
+	duel_data[winner] = nil
 end
 
 function duel.challenge(challenger,challenged)
-	if duel_data.state ~= 0 or (minetest.get_gametime() - duel_data.time) < 60 then
+	-- Check if a duel is currently in progress
+	if duel_data.state == 1 and (minetest.get_gametime() - duel_data.time) < 60 then
+		if minetest.get_player_name(duel_data.challenger_name) 	
+				and minetest.get_player_name(duel_data.challenged_name) then
+			return false
+		end
+	elseif duel_data.state == 2 then
 		return false
 	end
 	
@@ -142,6 +153,10 @@ function duel.in_duel(name)
 	end
 	return false
 end
+
+minetest.register_on_leaveplayer(function(player)
+	duel.lose(player:get_player_name())
+end)
 
 minetest.register_on_dieplayer(function(player)
 	local name = player:get_player_name()
