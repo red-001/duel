@@ -95,9 +95,15 @@ end
 
 function duel.challenge(challenger,challenged)
 	-- Check if a duel is currently in progress
+	-- TODO: Improve this
+	if challenger == duel_data.challenged_name then
+		duel.accept(challenger)
+		return true
+	end
+
 	if duel_data.state == 1 and (minetest.get_gametime() - duel_data.time) < 60 then
-		if minetest.get_player_name(duel_data.challenger_name) 	
-				and minetest.get_player_name(duel_data.challenged_name) then
+		if minetest.get_player_by_name(duel_data.challenger_name) 	
+				and minetest.get_player_by_name(duel_data.challenged_name) then
 			return false
 		end
 	elseif duel_data.state == 2 then
@@ -181,7 +187,7 @@ minetest.register_on_dieplayer(function(player)
 	end
 end)
 
--- Stop minetest from moving the losing player to a spawm point
+-- Stop minetest from moving the losing player to a spawn point
 minetest.register_on_respawnplayer(function(player)
 	local name = player:get_player_name()
 	for i,v in ipairs(duel_data.move_on_respawn) do
